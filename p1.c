@@ -36,6 +36,11 @@ int main(int argc, const char * argv[]) {
     char binaryInt[30];
     char mantiInt[34], exp_Int[10], binaryD[40];
     float inputTop=2.3, inputD = 0, inputManti = 0;
+
+    printf("Input a real number: ");
+    scanf("%f", &inputTop);
+
+    printf("input is: %f\n", inputTop);
     
     /* Integer */
     if((int)inputTop-inputTop == 0 && (int)inputTop!=0){
