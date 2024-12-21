@@ -24,18 +24,28 @@
 
 #define EXPONENT_BIAS 127
 
-// function to convert an integer to binary
-void convertIntegerToBinary (int inputInt, int *binaryInt, int *bitCount) {
-    int i = 0, quotient, remainder;
+/**
+ * Converts an integer to binary
+ * The binary digits are stored in 'binaryArray' in reverse order
+ *
+ * @param inputInt The integer to convert
+ * @param binaryArray The array where the binary representation will be stored
+ * @param bitCount pointer to an integer where the number of bits will be stored
+ */
+void convertIntegerToBinary (int inputInt, int *binaryArray, int *bitCount) {
+    int bitIndex = 0, quotient, remainder;
+
+    // perform the division and modulus operations
     do {
         quotient = inputInt / 2;
         remainder = inputInt % 2;
-        binaryInt[i++] = (char)remainder;
-        inputInt = quotient;
+        binaryArray[bitIndex++] = (char)remainder; // store remainder
+        inputInt = quotient;                       // update inputInt to quotient
     } while (quotient != 0);
 
-    binaryInt[i] = '\0'; // proper null termination
-    *bitCount = i; // store the number of bits
+    *bitCount = bitIndex; // store the number of bits
+    binaryArray[bitIndex] = '\0'; // proper null termination
+
 }
 
 /**
@@ -76,23 +86,21 @@ void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
 }
 
 /**
- * Get sign Bit
- * @param input
- * @return
+ * Returns 1 if number is negative, else 0
  */
 int getSignBit (float input) {
     return (input <0)? 1:0;
 }
 
 int main(int argc, const char * argv[]) {
-    float userInput= 2.3;
+    float userInputFloat= 2.3;
+
+    // prompt the user for input
     printf("Input a real number: ");
-    scanf("%f", &userInput);
+    scanf("%f", &userInputFloat);
 
-    // get sign bit
-    int signBit = getSignBit(userInput);
-
-    if (userInput == 0.0f) {
+    // quick check for zero as user input
+    if (userInputFloat == 0.0f) {
         printf("Everything is 0\n");
         printf("Sign: 0\n");
         printf("Exponent: 00000000\n");
@@ -100,104 +108,102 @@ int main(int argc, const char * argv[]) {
         return 0;
     }
 
+    // get sign bit
+    int signBit = getSignBit(userInputFloat);
+
 
     // declare variables
-    int i = 0,i2 = 0, countInt = 0, countD=0, quotient=0, remainder,
+    int i = 0, integerBitCount = 0, countD=0, quotient=0, remainder,
     exp = 0, countIntE = 0, countExp = 0, countManti=0;
-    int binaryInt[30];
-    char mantiInt[34], exp_Int[10], binaryD[40];
+    int exp_Int[10], binaryD[40];
 
+    int binaryArray[32]; //32bit, max for most integers
     float inputD = 0, inputManti = 0;
-    // prompt the user for input
 
+    printf("Input is: %f\n", userInputFloat);
 
-    printf("Input is: %f\n", userInput);
-
-
-    int inputInt = (int)userInput;
-    float inputFraction = userInput - inputInt;
-
-
-
+    int userInputInt = (int)userInputFloat;
+    float userInputFraction = userInputFloat - userInputInt;
 
 
 
     /* When user input is an integer */
-    if(userInput == (int)userInput  && userInput!=0) {
+    if(userInputFloat == (int) userInputFloat  && userInputFloat!=0) {
+        int mantissaArray[34];
 
         // Determine sign, convert negative to positive for ease of calculation
-        if(userInput<0)
-            inputInt = -inputInt;
+        if(userInputFloat<0) userInputInt = -userInputInt;
 
         // Call the function to convert integer to binary
-        convertIntegerToBinary(inputInt, binaryInt, &countInt);
+        convertIntegerToBinary(userInputInt, binaryArray, &integerBitCount);
 
         // print the binary representation of the integer part
-        printf("binary (integer): ");
-        for (int i=countInt-1; i>=0; i--) {
-            printf("%d", binaryInt[i]);
+        printf("binary version of user input: ");
+        for (int binaryIndex = integerBitCount-1; binaryIndex>=0; binaryIndex--) {
+            printf("%d", binaryArray[binaryIndex]);
         }
         printf("\n");
 
-        mantiInt[0] = signBit;
-        printf("Sign: %d\n", signBit);
+
 
 
         // Generating Mantissa
-        i2 = 1;
-        for (int i = countInt - 1; i > 0; i--){
-            mantiInt[i2]=binaryInt[i];
-            i2++;
+        mantissaArray[0] = signBit; // store the sign bit
+        printf("Sign: %d\n", signBit);
+
+        // copy binary digits of the integer part, skipping the leading bit
+        int mantissaIndex = 1; // start filling from index 1
+        for (int binaryIndex = integerBitCount - 2; binaryIndex >= 0; binaryIndex--){
+            mantissaArray[mantissaIndex++]=binaryArray[binaryIndex];
         }
 
 
 
 
-        // filling array with 0s
-        while (i2<=23){
-            mantiInt[i2]=0;
-            i2++;
+        // pad the remaining mantissa position with zeros up to 23 bits
+        while (mantissaIndex<=23){
+            mantissaArray[mantissaIndex++]=0;
         }
 
         // print the mantissa
-        i2=0;
         printf("Mantissa (24 bit): ");
-        while (i2<=23){
-            printf("%d", mantiInt[i2]);
-            i2++;
+        mantissaIndex=0;
+        while (mantissaIndex<=23){
+            printf("%d", mantissaArray[mantissaIndex]);
+            mantissaIndex++;
         }
         printf("\n");
-        //printf("Digit count is: %d\n", i2);
+        printf("Digit count is: %d\n", mantissaIndex);
 
 
 
 
 
         // exponent
-        exp = countInt-1; // unbiased exponent
+        exp = integerBitCount-1; // unbiased exponent
 
-        // inputInt = 127+exp; // biased exponent
-        // do {
-        //     quotient=inputInt/2;
-        //     remainder=inputInt%2;
-        //     exp_Int[i++]=remainder;
-        //     inputInt=quotient;
-        // } while(quotient!=0);
-        //
-        // // `i` now holds the number of bits in the exponent
-        // countIntE = i;
-        //
-        // while (countIntE<8) {
-        //     exp_Int[countIntE++]=0;
-        // }
+        userInputInt = 127+exp; // biased exponent
+        do {
+            quotient=userInputInt/2;
+            remainder=userInputInt%2;
+            exp_Int[i++]=remainder;
+            userInputInt=quotient;
+        } while(quotient!=0);
+
+        // `i` now holds the number of bits in the exponent
+        countIntE = i;
+
+        while (countIntE<8) {
+            exp_Int[countIntE++]=0;
+        }
 
         // calculate with funciton
-        calculateExponent(exp, exp_Int, &countIntE);
-        printf("countIntE: %d\n", countIntE);
+        //calculateExponent(exp, exp_Int, &countIntE);
+        //printf("countIntE: %d\n", countIntE);
 
         // print Exponent
-        printf("Exponent: ");
-        printf("%d\n", exp_Int[countIntE-1]);
+        // printf("Exponent: ");
+        // printf("%d\n", exp_Int[countIntE-1]);
 
         // print in reverse order
         for (int j =countIntE-1;j>=0;j--) {
@@ -213,15 +219,15 @@ int main(int argc, const char * argv[]) {
 
 
     /* 0.[non-zero] */
-    else if ((int)userInput - userInput != 0 && (int)userInput == 0){
-        if(userInput<0)
-            inputD = userInput * -1;
+    else if ((int)userInputFloat - userInputFloat != 0 && (int)userInputFloat == 0){
+        if(userInputFloat<0)
+            inputD = userInputFloat * -1;
         else
-            inputD = userInput;
+            inputD = userInputFloat;
         inputManti = inputD;
         char binaryD[40];
         i=0;
-        printf("Input is %f\n", userInput);
+        printf("Input is %f\n", userInputFloat);
         while (inputD-(int)inputD != 0 && i<55){
             inputD = inputD * 2;
             binaryD[i]=(int)inputD;
@@ -244,7 +250,7 @@ int main(int argc, const char * argv[]) {
             }
             i=countDot;
             countManti=0;
-            if(userInput>=0){
+            if(userInputFloat>=0){
                 binaryD[countDot-1]=0;
                 printf("Sign: 0\n");
             } else {
@@ -263,14 +269,14 @@ int main(int argc, const char * argv[]) {
         // exponent
         int exp = 0;
         exp = countDot;
-        inputInt = 127-countDot;
+        userInputInt = 127-countDot;
         int countDE = 0; i = 0;
         char exp_D[10];
         do{
-            quotient=inputInt/2;
-            remainder=inputInt%2;
+            quotient=userInputInt/2;
+            remainder=userInputInt%2;
             exp_D[i]=remainder;
-            inputInt=quotient;
+            userInputInt=quotient;
             i++;
         } while(quotient!=0);
         exp_D[i]='a';
@@ -288,43 +294,43 @@ int main(int argc, const char * argv[]) {
         }
         printf("\n");
     } /* End of 0.[non-zero] */
-    else if (userInput == 0){
+    else if (userInputFloat == 0){
         printf("Everything is 0\n");
     }
     /* [non-zero].[non-zero]*/
     else {
         i=0;
-        printf("Input: %f\n", userInput);
-        if (userInput<0)
-            inputInt = userInput*-1;
+        printf("Input: %f\n", userInputFloat);
+        if (userInputFloat<0)
+            userInputInt = userInputFloat*-1;
         else
-            inputInt = (int)userInput;
+            userInputInt = (int)userInputFloat;
 
         // call method to convert the int part to bin
-        convertIntegerToBinary(inputInt, binaryInt, &countInt);
+        convertIntegerToBinary(userInputInt, binaryArray, &integerBitCount);
 
         // print the bin version of the int part
         printf("binary (integer): ");
-        for (int i=countInt-1; i>=0; i--) {
-            printf("%d", binaryInt[i]);
+        for (int i=integerBitCount-1; i>=0; i--) {
+            printf("%d", binaryArray[i]);
         }
         printf("\n");
 
 
 
         char binary[60]; int b_i=0;
-        for (i=countInt-1;i>=0;i--){
-            binary[b_i]=binaryInt[i];
+        for (i=integerBitCount-1;i>=0;i--){
+            binary[b_i]=binaryArray[i];
             b_i++;
         }
 
 
         // converting post decimal part
-        inputD=userInput-(int)userInput;
-        if(userInput<0)
-            inputD=(userInput*-1)-((int)userInput*-1);
+        inputD=userInputFloat-(int)userInputFloat;
+        if(userInputFloat<0)
+            inputD=(userInputFloat*-1)-((int)userInputFloat*-1);
         else
-            inputD=userInput-(int)userInput;
+            inputD=userInputFloat-(int)userInputFloat;
         inputManti=inputD;
         char binaryD[40];
         i=0;
@@ -351,15 +357,15 @@ int main(int argc, const char * argv[]) {
         }
 
         // mantissa
-        i2=0;
+        int mantissaIndex=0;
         char mantiInt[34];
-        for(i=countInt-2; i>= 0; i--){
-            mantiInt[i2]=binaryInt[i];
-            i2++;
+        for(i=integerBitCount-2; i>= 0; i--){
+            mantiInt[mantissaIndex]=binaryArray[i];
+            mantissaIndex++;
         }
         char manti[34];
         i=0;
-        if(userInput>=0){
+        if(userInputFloat>=0){
             manti[0]=0;
             printf("Sign: 1\n");
         } else {
@@ -379,16 +385,16 @@ int main(int argc, const char * argv[]) {
 
         // exponent
         int exp = 0, exp_i;
-        exp = countInt-1;
-        inputInt=127+exp;
+        exp = integerBitCount-1;
+        userInputInt=127+exp;
         int countIntE=0; i=0;
         char exp_Int[8];
         int countExp = 0;
         do {
-            quotient=inputInt/2;
-            remainder=inputInt%2;
+            quotient=userInputInt/2;
+            remainder=userInputInt%2;
             exp_Int[i]=remainder;
-            inputInt=quotient;
+            userInputInt=quotient;
             i++;
         } while (quotient!=0);
         exp_Int[i]='a';
@@ -397,7 +403,7 @@ int main(int argc, const char * argv[]) {
         }
         while (countIntE<8){
             exp_Int[countIntE]=0;
-            countInt=countInt+1;
+            integerBitCount=integerBitCount+1;
             exp_Int[countIntE]='a';
         }
         printf("\n");
