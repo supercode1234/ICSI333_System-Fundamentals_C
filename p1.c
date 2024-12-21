@@ -62,7 +62,7 @@ void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
         quotient1 = biasedExp / 2;
         remainder1 = biasedExp % 2;
         expBinary[i++] = remainder1;
-        printf("debugging,%d",expBinary[j=i-1]);
+        printf("debugging, remainder: %d",expBinary[j=i-1]);
         biasedExp = quotient1;
         printf("quotient: %d\n",quotient1);
     } while (quotient1 != 0);
@@ -76,13 +76,6 @@ void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
         printf("hi, testing");
         expBinary [(*bitCount)++] = 0;
     }
-    printf("printing:\n");
-    for (int j =(*bitCount)-1;j>=0;j--) {
-        //printf();
-        printf("%d", expBinary[j]);
-        fflush(stdout);
-    }
-    printf("\n");
 }
 
 /**
@@ -158,8 +151,6 @@ int main(int argc, const char * argv[]) {
         }
 
 
-
-
         // pad the remaining mantissa position with zeros up to 23 bits
         while (mantissaIndex<=23){
             mantissaArray[mantissaIndex++]=0;
@@ -177,37 +168,18 @@ int main(int argc, const char * argv[]) {
 
 
 
-
-
         // exponent
         exp = integerBitCount-1; // unbiased exponent
 
-        userInputInt = 127+exp; // biased exponent
-        do {
-            quotient=userInputInt/2;
-            remainder=userInputInt%2;
-            exp_Int[i++]=remainder;
-            userInputInt=quotient;
-        } while(quotient!=0);
-
-        // `i` now holds the number of bits in the exponent
-        countIntE = i;
-
-        while (countIntE<8) {
-            exp_Int[countIntE++]=0;
-        }
 
         // calculate with funciton
-        //calculateExponent(exp, exp_Int, &countIntE);
-        //printf("countIntE: %d\n", countIntE);
+        calculateExponent(exp, exp_Int, &countIntE);
 
         // print Exponent
-        // printf("Exponent: ");
-        // printf("%d\n", exp_Int[countIntE-1]);
+         printf("Exponent: ");
 
         // print in reverse order
         for (int j =countIntE-1;j>=0;j--) {
-            //printf();
             printf("%d", exp_Int[j]);
             fflush(stdout);
         }
