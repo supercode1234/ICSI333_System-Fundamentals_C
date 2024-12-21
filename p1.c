@@ -24,28 +24,18 @@
 
 #define EXPONENT_BIAS 127
 
-/**
- * Converts an integer to binary
- * The binary digits are stored in 'binaryArray' in reverse order
- *
- * @param inputInt The integer to convert
- * @param binaryArray The array where the binary representation will be stored
- * @param bitCount pointer to an integer where the number of bits will be stored
- */
+// Function to convert an integer to binary
 void convertIntegerToBinary (int inputInt, int *binaryArray, int *bitCount) {
     int bitIndex = 0, quotient, remainder;
-
-    // perform the division and modulus operations
     do {
         quotient = inputInt / 2;
         remainder = inputInt % 2;
-        binaryArray[bitIndex++] = (char)remainder; // store remainder
-        inputInt = quotient;                       // update inputInt to quotient
+        binaryArray[bitIndex++] = remainder;
+        inputInt = quotient;
     } while (quotient != 0);
 
-    *bitCount = bitIndex; // store the number of bits
-    binaryArray[bitIndex] = '\0'; // proper null termination
-    // print the binary representation of the integer part
+    *bitCount = bitIndex;
+
     printf("binary version of user input: ");
     for (int binaryIndex = *bitCount-1; binaryIndex>=0; binaryIndex--) {
         printf("%d", binaryArray[binaryIndex]);
@@ -55,21 +45,17 @@ void convertIntegerToBinary (int inputInt, int *binaryArray, int *bitCount) {
 }
 
 /**
- *Calculates Exponent
+ * Calculates the biased Exponent
  */
 void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
-    int biasedExp = 127 + unbiasedExp; // bias the exponent
-    printf("Biased Exponent (Decimal): %d\n", biasedExp);
-
-    int i = 0, j=0,quotient1, remainder1;
-
-    // convert biased exponent to binary
+    int biasedExp = EXPONENT_BIAS + unbiasedExp;
+    int i = 0, j=0,quotient, remainder;
     do {
-        quotient1 = biasedExp / 2;
-        remainder1 = biasedExp % 2;
-        expBinary[i++] = remainder1;
-        biasedExp = quotient1;
-    } while (quotient1 != 0);
+        quotient = biasedExp / 2;
+        remainder = biasedExp % 2;
+        expBinary[i++] = remainder;
+        biasedExp = quotient;
+    } while (quotient != 0);
 
     *bitCount = i; // store the number of bits
     printf("i is: %d",i);
