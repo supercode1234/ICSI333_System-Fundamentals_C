@@ -206,8 +206,6 @@ int main(int argc, const char * argv[]) {
     }/* End of Integer */
 
 
-
-
     /* 0.[non-zero] */
     else if ((int)userInput - userInput != 0 && (int)userInput == 0){
         int mantissaBitCount=0;
@@ -220,37 +218,12 @@ int main(int argc, const char * argv[]) {
 
         printf("Input is %f\n", userInput);
 
-        // Convert fractional part to binary
-        while (fractionalPart != 0 && index <55){
-            fractionalPart *= 2; // calculation
-            binaryFraction[index++]=(int)fractionalPart; // store integer part
-            if(fractionalPart>=1){
-                fractionalPart -= (int)fractionalPart; // Remove integr part
-            }
-        }
-        printf("Binary Fraction: ");
-        for (int j=0;j<index;j++) {
-            printf("%d", binaryFraction[j]);
-        }
-        printf("\n");
-
-        int fractionalBitCount = index;
-
+        int fractionalBitCount = convertFractionToBinary(absInput, binaryFraction, 55);
         // Find position of the first '1' in the fractional binary
         int leadingOneIndex = 0;
-        while(binaryFraction[leadingOneIndex]!=1 && leadingOneIndex<fractionalBitCount){
+        while(binaryFraction[leadingOneIndex]!=1 && leadingOneIndex<fractionalBitCount) {
             leadingOneIndex++;
         }
-
-
-        // Generate Sign Bit
-        if(userInput>=0){
-            printf("Sign: 0\n");
-        } else {
-            printf("Sign: 1\n");
-        }
-
-
 
 
         // mantissa
@@ -271,12 +244,9 @@ int main(int argc, const char * argv[]) {
         printf("Mantissa bits: %d\n", mantissaBitCount);
 
         // exponent
-        //int exp = 0;
         int unbiasedExponent = -(leadingOneIndex +1);
-        int exponentBinary[8] = {0}; // array to store the 8-bit binary expression
+
         exponentBitCount = 0;
-        printf("leadingOneIndex: %d\n", leadingOneIndex);
-        printf("biased Exponent: %d\n", unbiasedExponent);
 
         // generate the binary representation of exponent
         calculateExponent(unbiasedExponent, exponentBinary, &exponentBitCount);
