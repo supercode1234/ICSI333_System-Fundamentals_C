@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <math.h> // for fabs, etc.
+#include <stdlib.h>
 
 #define EXPONENT_BIAS 127
 
@@ -43,6 +44,26 @@ void convertIntegerToBinary (int inputInt, int *binaryArray, int *bitCount) {
     printf("\n");
 
 }
+void calculateExponentForFraction(float fractionPart, int *exponentArray) {
+
+}
+int convertFractionToBinary(float fractionalPart, char *binaryArray, int maxBits) {
+    int index = 0;
+    while (fractionalPart != 0 && index < maxBits) {
+        fractionalPart *= 2; // shift left
+        binaryArray[index++] = (int)fractionalPart; // store the integer part
+        if (fractionalPart >= 1) {
+            fractionalPart -= (int)fractionalPart; // remove integer part for next calculation
+        }
+    }
+    printf("binary version of user input: ");
+    for (int binaryIndex = 0; binaryIndex < index; binaryIndex++) {
+        printf("%d", binaryArray[binaryIndex]);
+    }
+    printf("\n");
+    return index;
+
+}
 
 // Function to calculate the biased exponent
 void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
@@ -50,8 +71,11 @@ void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
     int i = 0, j=0,quotient, remainder;
     do {
         quotient = biasedExp / 2;
+        //printf("quotient = %d\n", quotient);
         remainder = biasedExp % 2;
+        //printf("remainder = %d\n", remainder);
         expBinary[i++] = remainder;
+        //printf("remainder %d\n", remainder);
         biasedExp = quotient;
     } while (quotient != 0);
 
@@ -131,12 +155,12 @@ int main(int argc, const char * argv[]) {
     // Work with absolute value of input
     float absInput = fabs(userInput);
 
-    int i = 0, integerBitCount = 0, countD=0, quotient=0, remainder,
+    int i = 0, integerBitCount = 0, fractionlBitCount=0, quotient=0, remainder,
     exponent = 0, exponentBitCount = 0, countExp = 0;
     int binaryD[40];
 
     int binaryInteger[32], binaryFraction[55], mantissa[23];
-    float inputD = 0, inputManti = 0;
+    float inputManti = 0;
 
     printf("Input is: %f\n", userInput);
     int integerPart = (int)absInput;
@@ -152,8 +176,11 @@ int main(int argc, const char * argv[]) {
 
     // Convert fractional part to binary
     if (fractionalPart > 0) {
-        //
+        int fractionalBitCount = convertFractionToBinary(fractionalPart, binaryFraction, 55);
     }
+
+
+
 
 
     /* When user input is an integer */
@@ -183,83 +210,80 @@ int main(int argc, const char * argv[]) {
 
     /* 0.[non-zero] */
     else if ((int)userInput - userInput != 0 && (int)userInput == 0){
-        int countManti=0;
-        if(userInput<0)
-            inputD = userInput * -1;
-        else
-            inputD = userInput;
-        inputManti = inputD;
-        char binaryD[40];
-        i=0;
+        int mantissaBitCount=0;
+
+
+        if(userInput<0) userInput = absInput;
+
+        char binaryFraction[40]; // Array to hold fractional binary digits
+        int index = 0;
+
         printf("Input is %f\n", userInput);
-        while (inputD-(int)inputD != 0 && i<55){
-            inputD = inputD * 2;
-            binaryD[i]=(int)inputD;
-            if(inputD>1){
-                inputD = inputD-(int)inputD;
+
+        // Convert fractional part to binary
+        while (fractionalPart != 0 && index <55){
+            fractionalPart *= 2; // calculation
+            binaryFraction[index++]=(int)fractionalPart; // store integer part
+            if(fractionalPart>=1){
+                fractionalPart -= (int)fractionalPart; // Remove integr part
             }
-            i++;
         }
-        binaryD[35]='a';
-        countD=0;
-        while(binaryD[countD]!='a'){
-            countD++;
-        }
-
-            i=-1;
-            int countDot=0;
-            while(binaryD[i]!=1){
-                countDot++;
-                i++;
-            }
-            i=countDot;
-            countManti=0;
-            if(userInput>=0){
-                binaryD[countDot-1]=0;
-                printf("Sign: 0\n");
-            } else {
-                binaryD[countDot-1]=1;
-                printf("Sign: 1\n");
-            }
-        // mantissa
-        printf("Mantissa (24 bit): ");
-        for (i=countDot-1;i<=22+countDot;i++){
-            printf("%d", binaryD[i]);fflush(stdout);
-            countManti++;
-        }
-        printf("\n");fflush(stdout);
-        //printf("Mantissa bits: %d\n", countManti);
-
-
-        // exponent
-
-        int exp = 0;
-        exp = countDot;
-        integerPart = 127-countDot;
-        int countDE = 0; i = 0;
-        char exp_D[10];
-        do{
-            quotient=integerPart/2;
-            remainder=integerPart%2;
-            exp_D[i]=remainder;
-            integerPart=quotient;
-            i++;
-        } while(quotient!=0);
-        exp_D[i]='a';
-        while(exp_D[countDE]!='a'){
-            countDE++;
-        }
-        while(countDE<8){
-            exp_D[countDE]=0;
-            countDE=countDE+1;
-            exp_D[countDE]='a';
-        }
-        printf("Exponent: ");
-        for (i=countDE-1;i>=0;i--){
-            printf("%d", exp_D[i]);fflush(stdout);
+        printf("Binary Fraction: ");
+        for (int j=0;j<index;j++) {
+            printf("%d", binaryFraction[j]);
         }
         printf("\n");
+
+        int fractionalBitCount = index;
+
+        // Find position of the first '1' in the fractional binary
+        int leadingOneIndex = 0;
+        while(binaryFraction[leadingOneIndex]!=1 && leadingOneIndex<fractionalBitCount){
+            leadingOneIndex++;
+        }
+
+
+        // Generate Sign Bit
+        if(userInput>=0){
+            printf("Sign: 0\n");
+        } else {
+            printf("Sign: 1\n");
+        }
+
+
+
+
+        // mantissa
+        printf("Mantissa (24 bit): ");
+        printf("leadingOneIndex: %d\n", leadingOneIndex);
+        mantissaBitCount=0;
+        for (int i = leadingOneIndex+1; mantissaBitCount < 23; i++, mantissaBitCount++){
+            if (i < fractionalBitCount) {
+                printf("%d", binaryFraction[i]);fflush(stdout);
+            } else {
+                printf("0"); // pad with zero if fractional binary is shorter
+            }
+
+            //printf("mantissaBitCount: %d\n", mantissaBitCount);
+        }
+
+        printf("\n");fflush(stdout);
+        printf("Mantissa bits: %d\n", mantissaBitCount);
+
+        // exponent
+        //int exp = 0;
+        int unbiasedExponent = -(leadingOneIndex +1);
+        int exponentBinary[8] = {0}; // array to store the 8-bit binary expression
+        exponentBitCount = 0;
+        printf("leadingOneIndex: %d\n", leadingOneIndex);
+        printf("biased Exponent: %d\n", unbiasedExponent);
+
+        // generate the binary representation of exponent
+        calculateExponent(unbiasedExponent, exponentBinary, &exponentBitCount);
+
     } /* End of 0.[non-zero] */
+
+
 
     /* [non-zero].[non-zero]*/
     else {
@@ -290,26 +314,26 @@ int main(int argc, const char * argv[]) {
 
 
         // converting post decimal part
-        inputD=userInput-(int)userInput;
+        userInput=userInput-(int)userInput;
         if(userInput<0)
-            inputD=(userInput*-1)-((int)userInput*-1);
+            userInput=(userInput*-1)-((int)userInput*-1);
         else
-            inputD=userInput-(int)userInput;
-        inputManti=inputD;
+            userInput=userInput-(int)userInput;
+        inputManti=userInput;
         char binaryD[40];
         i=0;
-        while (inputD-(int)inputD != 0 && i<50){
-            inputD = inputD*2;
-            binaryD[i]=(int)inputD;
-            if(inputD>1){
-                inputD=inputD-(int)inputD;
+        while (userInput-(int)userInput != 0 && i<50){
+            userInput = userInput*2;
+            binaryD[i]=(int)userInput;
+            if(userInput>1){
+                userInput=userInput-(int)userInput;
             }
             i++;
         }
         binaryD[39]='a';
-        countD=0;
-        while(binaryD[countD]!='a'){
-            countD++;
+        fractionlBitCount=0;
+        while(binaryD[fractionlBitCount]!='a'){
+            fractionlBitCount++;
         }
 
 
@@ -351,7 +375,6 @@ int main(int argc, const char * argv[]) {
 
         // Calculate biased exponent and print
         calculateExponent(unbiasedExponent, exponentBinary, &exponentBitCount);
-
     }
     
     return 0;
