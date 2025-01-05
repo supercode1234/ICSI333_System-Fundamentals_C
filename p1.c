@@ -178,6 +178,7 @@ int main(int argc, const char * argv[]) {
     if (fractionalPart > 0) {
         int fractionalBitCount = convertFractionToBinary(fractionalPart, binaryFraction, 55);
     }
+    //int unbiasedExponent =
 
 
 
@@ -210,15 +211,14 @@ int main(int argc, const char * argv[]) {
     else if ((int)userInput - userInput != 0 && (int)userInput == 0){
         int mantissaBitCount=0;
 
-
-        if(userInput<0) userInput = absInput;
-
         char binaryFraction[40]; // Array to hold fractional binary digits
         int index = 0;
 
         printf("Input is %f\n", userInput);
 
-        int fractionalBitCount = convertFractionToBinary(absInput, binaryFraction, 55);
+        int fractionalBitCount = convertFractionToBinary(fractionalPart, binaryFraction, 55);
+
+
         // Find position of the first '1' in the fractional binary
         int leadingOneIndex = 0;
         while(binaryFraction[leadingOneIndex]!=1 && leadingOneIndex<fractionalBitCount) {
@@ -236,8 +236,6 @@ int main(int argc, const char * argv[]) {
             } else {
                 printf("0"); // pad with zero if fractional binary is shorter
             }
-
-            //printf("mantissaBitCount: %d\n", mantissaBitCount);
         }
 
         printf("\n");fflush(stdout);
@@ -252,6 +250,9 @@ int main(int argc, const char * argv[]) {
         calculateExponent(unbiasedExponent, exponentBinary, &exponentBitCount);
 
     } /* End of 0.[non-zero] */
+
+
+
 
 
 
