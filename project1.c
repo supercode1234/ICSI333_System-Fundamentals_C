@@ -39,14 +39,6 @@ void convertIntegerToBinary(int inputInt, int *binaryArray, int *bitCount){
     printf("%d", binaryArray[i]);
   }
   printf("\n");
-
-
-  // printf("Binary (integer part): ");
-  // for (int i = *bitCount - 1; i >= 0; i--){
-  //   printf("%d", binaryArray[i]);
-  // }
-  // printf("\n");
-
 }
 
 // function to convert a fractional part to binary
@@ -93,10 +85,6 @@ void calculateExponent (int unbiasedExp, int *expBinary, int *bitCount) {
   for (int i = 0; i < *bitCount; i++) {
     printf("%d", expBinary[i]);
   }
-
-  // for (int i = *bitCount - 1; i >= 0; i--) {
-  //   printf("%d", expBinary[i]);
-  // }
   printf("\n");
 }
 
@@ -110,9 +98,6 @@ void generateMantissa(int *integerBinary, int intBitCount, char *fractionBinary,
     for (int i = 1; i < intBitCount; i++) { // Skip the first bit (leading 1)
       mantissaArray[mantissaIndex++] = integerBinary[i];
     }
-  // for (int i = intBitCount -2; i >= 0; i--) {
-  //   mantissaArray [mantissaIndex++] = integerBinary[i];
-  // }
   }
 
   // add binary digits from the fractional part
@@ -139,7 +124,7 @@ int getSignBit(float input){
   return (input < 0) ? 1 : 0;
 }
 
-/*
+
 // main function
 int main() {
   float userInput;
@@ -194,4 +179,3 @@ int main() {
   return 0;
 
  }
-*/
